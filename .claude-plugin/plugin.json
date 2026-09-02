@@ -1,0 +1,17 @@
+{
+  "name": "dsvideo-plugin",
+  "version": "0.1.0",
+  "description": "电商短视频出片：产品图+卖点 → MiniMax-H3。主路局域网 ComfyUI（comfy-mcp），备选 MiniMax 按量 API。",
+  "author": {
+    "name": "ZMGID"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/ZMGID/dsvideo-plugin",
+  "keywords": [
+    "ecommerce",
+    "minimax",
+    "h3",
+    "comfyui",
+    "video"
+  ]
+}
