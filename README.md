@@ -5,7 +5,74 @@
 - **主路**：机柜局域网 RTX 3090 上的 ComfyUI，经官方本地 [comfy-mcp](https://github.com/Comfy-Org/comfy-mcp)（stdio）提交 / 等待 / 取片。
 - **备选**：仅当 3090 队列满或局域网 Comfy 不可达时，走 MiniMax 按量 API（`mmx-h3-video` 技能）。API 备选假定本机 `PATH` 上已有 `mmx`。
 
-本仓库不是 MiniMax Hub 应用，也不是桌面客户端。
+本仓库不是 MiniMax Hub 应用，也不是桌面客户端。插件 id 为 `dsvideo-plugin`。
+
+## 安装 Codex（推荐）
+
+用 [Vercel skills CLI](https://github.com/vercel-labs/skills) 发现仓库根 `skills/*/SKILL.md`，装到用户级 Codex 技能目录（`~/.agents/skills/`）：
+
+```bash
+npx skills add ZMGID/dsvideo-plugin -a codex -g
+```
+
+该命令只装技能，**不会**写入 MCP。在跑 Codex 的那台机器上安装 `comfy-mcp`，并写入 `~/.codex/config.toml`：
+
+```bash
+pip install comfy-mcp "comfy-cli>=1.14.0"
+```
+
+```toml
+[mcp_servers.comfy-mcp]
+command = "comfy-mcp"
+
+[mcp_servers.comfy-mcp.env]
+COMFYUI_URL = "http://REPLACE_WITH_GPU_HOST:8188"
+```
+
+把 `REPLACE_WITH_GPU_HOST` 换成机柜 GPU 的局域网 IP 或主机名。不要改成 Comfy Cloud 的 HTTP MCP。不要把真实局域网 IP、API Key 或其它密钥提交进本仓库。
+
+重启 Codex 后即可使用技能。
+
+## 官方 Codex 插件（技能 + 捆绑 MCP）
+
+仓库带 `.codex-plugin/plugin.json` 与 `.agents/plugins/marketplace.json`。此路径会加载 `skills/` **以及** 根目录 `.mcp.json`：
+
+```bash
+codex plugin marketplace add ZMGID/dsvideo-plugin
+codex plugin add dsvideo-plugin@dsvideo
+```
+
+仍须本机有 `comfy-mcp`：
+
+```bash
+pip install comfy-mcp "comfy-cli>=1.14.0"
+```
+
+捆绑的 `.mcp.json` 里仍是占位符 `http://REPLACE_WITH_GPU_HOST:8188`。安装后：
+
+1. **改安装副本**（推荐，改的是 Codex 实际加载的捆绑 MCP）：
+
+   ```text
+   ~/.codex/plugins/cache/dsvideo/dsvideo-plugin/<version>/.mcp.json
+   ```
+
+   `<version>` 为 `plugin.json` 的 semver（当前 `0.1.0`）。把其中的 `COMFYUI_URL` 换成真实 GPU 地址。
+
+2. **或在 `~/.codex/config.toml` 写完整的用户级 MCP**（必须带 `command`，不能只写 `[mcp_servers.comfy-mcp.env]`——Codex 不会把 env 段合并进插件捆绑的服务器）：
+
+   ```toml
+   [mcp_servers.comfy-mcp]
+   command = "comfy-mcp"
+
+   [mcp_servers.comfy-mcp.env]
+   COMFYUI_URL = "http://REPLACE_WITH_GPU_HOST:8188"
+   ```
+
+改完重启 Codex。
+
+## 备用：克隆 + 符号链接
+
+若不想用 skills CLI 或官方插件命令，见 [`.codex/INSTALL.md`](.codex/INSTALL.md)：克隆到 `~/.codex/dsvideo-plugin`，把 `skills` 链到 `~/.agents/skills/dsvideo-plugin`，并**单独**在 `config.toml` 里配 MCP（符号链接不会自动加载 `.mcp.json`）。
 
 ## 四件套（仅此，无其它）
 
@@ -37,20 +104,6 @@
 
 `COMFYUI_URL` 只让 **提交 / 排队 / 上传 / 取结果** 打到远端 GPU。生命周期（启停 Comfy）和模型下载仍发生在 MCP 所在机器——权重必须已经在 3090 箱上。
 
-## 前置：客户端安装 comfy-mcp
-
-在 **跑代理的那台机器** 上需要 `comfy-mcp` 命令在 `PATH` 里：
-
-```bash
-pip install comfy-mcp "comfy-cli>=1.14.0"
-```
-
-把 `.mcp.json`（以及 Claude 插件安装副本）里的占位符换成机柜 GPU 的局域网 IP 或主机名：
-
-```text
-http://REPLACE_WITH_GPU_HOST:8188
-```
-
 GPU 箱上由用户自行启动 ComfyUI，例如：
 
 ```bash
@@ -58,11 +111,9 @@ GPU 箱上由用户自行启动 ComfyUI，例如：
 <你的 ComfyUI 启动方式> --listen 0.0.0.0 --port 8188
 ```
 
-不要把真实局域网 IP、API Key 或其它密钥提交进本仓库。
-
 ## Claude Code
 
-仓库本身就是单插件 marketplace（`marketplace.json` 与 `plugin.json` 同在 `.claude-plugin/`，插件 `source` 为仓库根 `./`）。
+仓库仍是单插件 Claude marketplace（`marketplace.json` 与 `plugin.json` 同在 `.claude-plugin/`，插件 `source` 为仓库根 `./`）：
 
 ```bash
 claude plugin marketplace add ZMGID/dsvideo-plugin
@@ -76,26 +127,7 @@ git clone https://github.com/ZMGID/dsvideo-plugin.git
 claude --plugin-dir ./dsvideo-plugin
 ```
 
-Claude Code 会加载根目录 `.mcp.json`（`comfy-mcp` + `COMFYUI_URL`）。技能命名空间为 `/dsvideo-plugin:ecom-h3-video`（以及同插件下的 `h3-prompt-writing`、`mmx-h3-video`）。
-
-仍须把 `COMFYUI_URL` 换成真实 GPU 地址（安装缓存或本地克隆里的 `.mcp.json`）。
-
-## Codex 与其它编码代理
-
-Codex **不会**自动读取 Claude 插件的 `.mcp.json`。需要两步：
-
-1. **技能**：把本仓库 `skills/*` 三个目录拷进该代理的 skills 目录（Codex CLI 一般为 `~/.codex/skills/`；其它代理按其文档放置）。保持目录名：`ecom-h3-video`、`h3-prompt-writing`、`mmx-h3-video`。
-2. **MCP**：在 Codex（或该代理）的 MCP 配置里加入与本仓库相同的 stdio 服务，例如 Codex `~/.codex/config.toml`：
-
-```toml
-[mcp_servers.comfy-mcp]
-command = "comfy-mcp"
-
-[mcp_servers.comfy-mcp.env]
-COMFYUI_URL = "http://REPLACE_WITH_GPU_HOST:8188"
-```
-
-其它代理：同样使用命令 `comfy-mcp`，环境变量 `COMFYUI_URL`。不要改成 Comfy Cloud 的 HTTP MCP。
+Claude Code 会加载根目录 `.mcp.json`（`comfy-mcp` + `COMFYUI_URL`）。技能命名空间为 `/dsvideo-plugin:ecom-h3-video`（以及同插件下的 `h3-prompt-writing`、`mmx-h3-video`）。仍须把 `COMFYUI_URL` 换成真实 GPU 地址（安装缓存或本地克隆里的 `.mcp.json`）。
 
 ## 用法（短）
 
@@ -110,6 +142,9 @@ COMFYUI_URL = "http://REPLACE_WITH_GPU_HOST:8188"
 ## 布局
 
 ```
+.codex-plugin/plugin.json          # Codex 插件清单（无 hooks）
+.agents/plugins/marketplace.json   # Codex marketplace add 用
+.codex/INSTALL.md                  # 克隆 + 符号链接备用说明
 .claude-plugin/plugin.json
 .claude-plugin/marketplace.json
 skills/ecom-h3-video/SKILL.md
@@ -120,7 +155,7 @@ README.md
 LICENSE                            # 本插件 MIT
 ```
 
-`.claude-plugin/` 里只有清单；`skills/` 与 `.mcp.json` 在插件根，不嵌套进 `.claude-plugin/`。
+`.codex-plugin/` 与 `.claude-plugin/` 里只有清单；`skills/` 与 `.mcp.json` 在仓库根，不复制第二份技能树。
 
 ## 许可与致谢
 
@@ -129,5 +164,5 @@ LICENSE                            # 本插件 MIT
 复制的官方技能文件保持上游原文（含 frontmatter），版权与许可归原作者：
 
 - [MiniMax-AI/MiniMax-H3](https://github.com/MiniMax-AI/MiniMax-H3) — `h3-prompt-writing`
-- [MiniMax-AI/cli](https://github.com/MiniMax-AI/cli) — `skill/h3-video`（本仓库目录 `mmx-h3-video`）
+- [MiniMax-AI/cli](https://github.com/MiniMax-AI/cli) — `skill/h3-video`（本仓库目录名 `mmx-h3-video`）
 - [Comfy-Org/comfy-mcp](https://github.com/Comfy-Org/comfy-mcp) — 本地 Comfy MCP（Python / PyPI `comfy-mcp`）
