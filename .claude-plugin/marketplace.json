@@ -1,0 +1,13 @@
+{
+  "name": "dsvideo",
+  "owner": {
+    "name": "ZMGID"
+  },
+  "plugins": [
+    {
+      "name": "dsvideo-plugin",
+      "source": "./",
+      "description": "电商短视频出片：产品图+卖点 → MiniMax-H3。主路局域网 ComfyUI（comfy-mcp），备选 MiniMax 按量 API。"
+    }
+  ]
+}
