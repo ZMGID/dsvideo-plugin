@@ -1,0 +1,34 @@
+{
+  "name": "dsvideo-plugin",
+  "version": "0.1.0",
+  "description": "电商短视频出片：产品图+卖点 → MiniMax-H3。主路局域网 ComfyUI（comfy-mcp），备选 MiniMax 按量 API。",
+  "author": {
+    "name": "ZMGID"
+  },
+  "homepage": "https://github.com/ZMGID/dsvideo-plugin",
+  "repository": "https://github.com/ZMGID/dsvideo-plugin",
+  "license": "MIT",
+  "keywords": [
+    "ecommerce",
+    "minimax",
+    "h3",
+    "comfyui",
+    "video"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "dsvideo",
+    "shortDescription": "产品图+卖点 → MiniMax-H3 电商短视频",
+    "longDescription": "电商短视频出片：产品图 + 卖点 + 平台规格 → MiniMax-H3。主路机柜局域网 ComfyUI（官方本地 comfy-mcp stdio），备选 MiniMax 按量 API。不是 MiniMax Hub，也不是 Comfy Cloud。",
+    "developerName": "ZMGID",
+    "category": "Media",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/ZMGID/dsvideo-plugin",
+    "defaultPrompt": [
+      "产品图加卖点，出一条 H3 电商短视频",
+      "按 9:16 把产品图写成 H3 提示词并出片",
+      "局域网 Comfy 出片，队列满再走 MiniMax API"
+    ]
+  }
+}
