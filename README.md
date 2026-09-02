@@ -48,9 +48,9 @@ codex plugin add dsvideo-plugin@dsvideo
 pip install comfy-mcp "comfy-cli>=1.14.0"
 ```
 
-捆绑的 `.mcp.json` 里仍是占位符 `http://REPLACE_WITH_GPU_HOST:8188`。安装后任选其一：
+捆绑的 `.mcp.json` 里仍是占位符 `http://REPLACE_WITH_GPU_HOST:8188`。安装后：
 
-1. **改安装副本**（Codex 把插件拷到缓存，不直接读仓库）：
+1. **改安装副本**（推荐，改的是 Codex 实际加载的捆绑 MCP）：
 
    ```text
    ~/.codex/plugins/cache/dsvideo/dsvideo-plugin/<version>/.mcp.json
@@ -58,7 +58,7 @@ pip install comfy-mcp "comfy-cli>=1.14.0"
 
    `<version>` 为 `plugin.json` 的 semver（当前 `0.1.0`）。把其中的 `COMFYUI_URL` 换成真实 GPU 地址。
 
-2. **用 `~/.codex/config.toml` 覆盖**（任何安装路径都有效）：
+2. **或在 `~/.codex/config.toml` 写完整的用户级 MCP**（必须带 `command`，不能只写 `[mcp_servers.comfy-mcp.env]`——Codex 不会把 env 段合并进插件捆绑的服务器）：
 
    ```toml
    [mcp_servers.comfy-mcp]
