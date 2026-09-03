@@ -1,0 +1,7 @@
+interface:
+  display_name: "dsvideo 视频生成"
+  short_description: "默认使用内置 H3 工作流生成新视频"
+  default_prompt: "Use $ecom-h3-video to generate a video from these instructions or product images."
+
+policy:
+  allow_implicit_invocation: true

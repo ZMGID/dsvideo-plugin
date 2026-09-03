@@ -1,10 +1,10 @@
 # dsvideo-plugin
 
-电商短视频插件，适用于 Codex 与 Claude Code。给产品图和卖点，按 MiniMax-H3 写出片。
+视频生成插件，适用于 Codex 与 Claude Code。用户只要提出生成视频、图片转视频或商品视频，默认由 dsvideo 使用内置 MiniMax-H3 工作流出片，不需要先点名插件。
 
 主路走你自己的 ComfyUI（[comfy-mcp](https://github.com/Comfy-Org/comfy-mcp)），连不上再走 MiniMax 按量 API。
 
-本地 ComfyUI 已有工作流时，插件会读取指定工作流到临时文件，先把本机商品素材上传到 ComfyUI，再替换提示词、输入素材、比例和时长后提交。服务器保存的原工作流不会被覆盖。
+插件内置已经解析好的三分支 ComfyUI 工作流和自动配置脚本。AI 不需要临时研究 82 个节点、分支开关或服务器枚举；只需上传本机素材，脚本按图片数量自动选择 T2VA、单图 Ref2VA 或多图 Ref2VA，填入提示词、素材、比例和时长后提交。
 
 API 备选链路由插件内置的零第三方依赖 Python 客户端直接调用 MiniMax 官方 Video Generation V2 API，不依赖 `mmx-cli`。默认使用国区官方 `https://api.minimax.cn`；国际账号才设置 `MINIMAX_REGION=global`。付费创建任务时必须明确选择 `768P` 或 `2K`；客户端提交前显示真实请求规格，成功后再核对返回的分辨率与时长。使用备选链路前，请在宿主环境安全配置 `MINIMAX_API_KEY`；不要把密钥写进仓库或发到聊天中。
 

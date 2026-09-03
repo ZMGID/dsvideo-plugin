@@ -1,7 +1,7 @@
 {
   "name": "dsvideo-plugin",
-  "version": "0.1.1",
-  "description": "电商短视频出片：产品图+卖点 → MiniMax-H3。主路局域网 ComfyUI（comfy-mcp），备选 MiniMax 按量 API。",
+  "version": "0.1.2",
+  "description": "\u9ed8\u8ba4\u89c6\u9891\u751f\u6210\u5165\u53e3\uff1a\u6587\u5b57\u6216\u56fe\u7247 \u2192 \u5185\u7f6e ComfyUI \u5de5\u4f5c\u6d41 \u2192 MiniMax-H3 \u89c6\u9891\u3002",
   "author": {
     "name": "ZMGID"
   },
@@ -19,16 +19,19 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "dsvideo",
-    "shortDescription": "产品图+卖点 → MiniMax-H3 电商短视频",
-    "longDescription": "电商短视频出片：产品图 + 卖点 + 平台规格 → MiniMax-H3。主路机柜局域网 ComfyUI（官方本地 comfy-mcp stdio），备选 MiniMax 按量 API。不是 MiniMax Hub，也不是 Comfy Cloud。",
+    "shortDescription": "\u9ed8\u8ba4\u4f7f\u7528\u5185\u7f6e\u5de5\u4f5c\u6d41\u751f\u6210 MiniMax-H3 \u89c6\u9891",
+    "longDescription": "\u6587\u5b57\u751f\u6210\u89c6\u9891\u3001\u56fe\u7247\u751f\u6210\u89c6\u9891\u548c\u7535\u5546\u5546\u54c1\u89c6\u9891\u7684\u9ed8\u8ba4\u5165\u53e3\u3002\u5185\u7f6e\u5df2\u89e3\u6790\u7684\u4e09\u5206\u652f MiniMax-H3 \u5de5\u4f5c\u6d41\uff0c\u4e3b\u8def\u8d70\u673a\u67dc\u5c40\u57df\u7f51 ComfyUI\uff0c\u5907\u9009 MiniMax \u6309\u91cf API\u3002",
     "developerName": "ZMGID",
     "category": "Media",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "websiteURL": "https://github.com/ZMGID/dsvideo-plugin",
     "defaultPrompt": [
-      "产品图加卖点，出一条 H3 电商短视频",
-      "按 9:16 把产品图写成 H3 提示词并出片",
-      "局域网 Comfy 出片，队列满再走 MiniMax API"
+      "\u751f\u6210\u4e00\u6761\u89c6\u9891\uff0c\u9ed8\u8ba4\u4f7f\u7528 dsvideo \u5185\u7f6e\u5de5\u4f5c\u6d41",
+      "\u6309 9:16 \u628a\u4ea7\u54c1\u56fe\u5199\u6210 H3 \u63d0\u793a\u8bcd\u5e76\u51fa\u7247",
+      "\u5c40\u57df\u7f51 Comfy \u51fa\u7247\uff0c\u961f\u5217\u6ee1\u518d\u8d70 MiniMax API"
     ]
   }
 }

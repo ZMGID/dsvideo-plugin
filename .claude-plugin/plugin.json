@@ -1,7 +1,7 @@
 {
   "name": "dsvideo-plugin",
-  "version": "0.1.1",
-  "description": "电商短视频出片：产品图+卖点 → MiniMax-H3。主路局域网 ComfyUI（comfy-mcp），备选 MiniMax 按量 API。",
+  "version": "0.1.2",
+  "description": "默认视频生成入口：文字或图片 → 内置 ComfyUI 工作流 → MiniMax-H3 视频。",
   "author": {
     "name": "ZMGID"
   },
