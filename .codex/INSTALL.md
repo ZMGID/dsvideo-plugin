@@ -1,6 +1,6 @@
 # 为 Codex 安装 dsvideo-plugin（克隆 + 符号链接）
 
-这是备用安装路径。推荐方式见仓库根 [README.md](../README.md)：`npx skills add ZMGID/dsvideo-plugin -a codex -g`，或官方 `codex plugin marketplace add`。
+这是不使用插件安装命令时的备用路径。正常安装请按仓库根 [README.md](../README.md) 使用 `codex plugin marketplace add`。
 
 Codex 会扫描 `~/.agents/skills`（`~/.codex/skills` 仍可用，但已弃用）。克隆并做符号链接即可被发现。
 
@@ -37,17 +37,17 @@ pip install comfy-mcp "comfy-cli>=1.14.0"
    cmd /c mklink /J "$env:USERPROFILE\.agents\skills\dsvideo-plugin" "$env:USERPROFILE\.codex\dsvideo-plugin\skills"
    ```
 
-3. **配置 MCP**（本步骤不会随符号链接自动完成）。编辑 `~/.codex/config.toml`，把占位符换成机柜 GPU 的局域网 IP 或主机名：
+3. **配置 MCP**（本步骤不会随符号链接自动完成）。编辑 `~/.codex/config.toml`，使用插件当前内置的公司 ComfyUI 地址：
 
    ```toml
    [mcp_servers.comfy-mcp]
    command = "comfy-mcp"
 
    [mcp_servers.comfy-mcp.env]
-   COMFYUI_URL = "http://REPLACE_WITH_GPU_HOST:8188"
+   COMFYUI_URL = "http://192.168.1.171:8188"
    ```
 
-   不要改成 Comfy Cloud 的 HTTP MCP。不要把真实局域网 IP 或密钥提交进本仓库。
+   不要改成 Comfy Cloud 的 HTTP MCP，也不要在这里配置 API Key。
 
 4. **重启 Codex**（退出并重新启动 CLI），以便发现技能。
 

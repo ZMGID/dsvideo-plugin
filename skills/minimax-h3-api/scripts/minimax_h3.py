@@ -307,8 +307,10 @@ def paid_request_summary(payload: dict[str, Any]) -> dict[str, Any]:
     }
     if roles & {"reference_image", "reference_video", "reference_audio"}:
         mode = "multimodal-reference"
-    elif "last_frame" in roles:
+    elif {"first_frame", "last_frame"} <= roles:
         mode = "first-last-frame"
+    elif "last_frame" in roles:
+        mode = "last-frame"
     elif "first_frame" in roles:
         mode = "first-frame"
     else:
@@ -368,16 +370,26 @@ def download_video(url: str, output: Path, *, attempts: int = 3) -> int:
         try:
             request = Request(url, headers={"User-Agent": "dsvideo-plugin/0.1"})
             with urlopen(request, timeout=120) as response, partial.open("wb") as target:
+                content_type = response.headers.get_content_type()
+                if content_type.startswith("text/") or content_type in {
+                    "application/json",
+                    "application/xml",
+                }:
+                    raise OSError(f"Download returned {content_type}, not a video.")
                 while chunk := response.read(1024 * 1024):
                     target.write(chunk)
             if partial.stat().st_size == 0:
                 raise OSError("Downloaded file is empty.")
+            with partial.open("rb") as source:
+                if source.read(8)[4:8] != b"ftyp":
+                    raise OSError("Downloaded file is not an MP4 video.")
             os.replace(partial, output)
             return output.stat().st_size
         except (HTTPError, URLError, OSError) as error:
             last_error = error
             if attempt + 1 < attempts:
                 time.sleep(2)
+    partial.unlink(missing_ok=True)
     raise ApiError(f"Video download failed after {attempts} attempts: {last_error}")
 
 
@@ -591,6 +603,11 @@ def main(argv: list[str] | None = None) -> int:
                 )
             )
         elif args.command == "wait":
+            missing_expectation = args.expect_resolution is None or args.expect_duration is None
+            if args.output and missing_expectation:
+                raise ValueError(
+                    "Downloading an existing task requires --expect-resolution and --expect-duration."
+                )
             if (args.expect_resolution is None) != (args.expect_duration is None):
                 raise ValueError(
                     "Set both --expect-resolution and --expect-duration to verify the paid request contract."

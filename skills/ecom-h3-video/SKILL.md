@@ -15,8 +15,8 @@ description: >
 1. 接收商品图和用户要求，以本次输入为准，不从历史任务继承时长或其他规格。若只有素材、时长/画幅和“宣传一下”这类宽泛要求，先按本次商品给出 `1.` `2.` `3.` 三个各一句话的不同视频方案，请用户选择；选择前不写完整剧本、不提交生成，选定后再继续。其他关键信息缺失时只问必要问题。
 2. 查看 `templates/*.json`（忽略 `_template.json`），按商品的展示方式、镜头目标、时长、画幅和参考图数量选择最接近的模板；品类名称只作辅助。没有合适模板时，读取 [references/product-page-directing.md](references/product-page-directing.md) 编排镜头。
 3. 读取同级技能 `h3-prompt-writing`，把选定方案写成完整 H3 提示词。一张图走单图参考，多张图走多图参考，无图才走 T2VA。
-4. 默认通过 `comfy-mcp` 出片。先运行 `scripts/fetch_saved_workflow.py <临时目录>/h3.original.json`，只从 `http://192.168.1.171:8188` 读取服务器上保存的 `【Work-Fisher】Minimax-H3 整合流程.json`；禁止扫描本机、当前工作区或其他 JSON。复制为临时工作副本后，按 [references/comfy-workflow-safety.md](references/comfy-workflow-safety.md) 只替换提示词、输入图片/视频、比例和时长；单图分支首次提交前把任务类型写成服务器标准枚举 `Ref2VA`，不要保留旧版中文说明。提交时跳过 `Fast Groups Bypasser (rgthree)` 等只供界面使用的节点，并记录 `prompt_id`；生成成功后必须用 `fetch_outputs` 下载到员工当前工作区并提供本地成片链接，不能只报告服务器成功。
-5. 指定工作流不存在或本地失败时只报告一条真实错误；不得为通过检查而新增允许路径或改其他参数，不搜索替代工作流、不推测模型问题、不自动改走付费 API。
+4. 默认通过 `comfy-mcp` 出片。先运行 `scripts/fetch_saved_workflow.py <临时目录>/h3.workflow.json`，只从 `http://192.168.1.171:8188` 读取服务器上保存的 `【Work-Fisher】Minimax-H3 整合流程.json`；禁止扫描本机、当前工作区或其他 JSON。若商品图片或视频来自员工电脑，先用 `upload_file` 上传绝对路径，并把返回的服务器文件名写入工作流。直接在这个临时文件中替换提示词、输入图片/视频、比例和时长；单图分支把任务类型写成服务器标准枚举 `Ref2VA`。用 `run_workflow` 提交并记录 `prompt_id`，生成成功后用 `fetch_outputs` 下载到员工当前工作区并提供本地成片链接，不能只报告服务器成功。
+5. 指定工作流不存在、素材上传失败或生成失败时只报告一条真实错误；不搜索替代工作流、不推测模型问题、不自动改走付费 API。
 6. 只有用户明确选择付费 API 时才读取同级技能 `minimax-h3-api`；提交前必须确认 `768P` 或 `2K`。
 
 ## 模板

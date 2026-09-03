@@ -129,12 +129,21 @@ class RequestTests(unittest.TestCase):
             },
         )
 
+    def test_last_frame_request_is_reported_as_last_frame(self):
+        request = minimax_h3.build_video_request(
+            prompt="End on the product",
+            resolution="768P",
+            last_frame="https://example.com/end.png",
+        )
+
+        self.assertEqual(minimax_h3.paid_request_summary(request)["mode"], "last-frame")
+
 
 class _ApiHandler(BaseHTTPRequestHandler):
     create_count = 0
     query_count = 0
     request_body = None
-    video_bytes = b"fake-mp4"
+    video_bytes = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2"
     fail_task = False
     result_resolution = "768P"
     result_duration = 11
@@ -201,6 +210,7 @@ class ClientTests(unittest.TestCase):
         _ApiHandler.create_count = 0
         _ApiHandler.query_count = 0
         _ApiHandler.request_body = None
+        _ApiHandler.video_bytes = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2"
         _ApiHandler.fail_task = False
         _ApiHandler.result_resolution = "768P"
         _ApiHandler.result_duration = 11
@@ -296,6 +306,48 @@ class ClientTests(unittest.TestCase):
 
         with self.assertRaisesRegex(minimax_h3.ApiError, "cannot verify"):
             minimax_h3.verify_task_contract(task, request, "task-123")
+
+    def test_wait_download_requires_expected_contract(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ,
+            {"MINIMAX_API_KEY": "secret-for-test"},
+        ):
+            output = Path(directory) / "result.mp4"
+            exit_code = minimax_h3.main(
+                [
+                    "--base-url",
+                    self.server.base_url,
+                    "wait",
+                    "task-123",
+                    "--output",
+                    str(output),
+                ]
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertEqual(_ApiHandler.query_count, 0)
+            self.assertFalse(output.exists())
+
+    def test_download_rejects_non_mp4_body(self):
+        _ApiHandler.video_bytes = b"<html>expired</html>"
+        client = minimax_h3.MiniMaxClient(self.server.base_url, "secret-for-test")
+        request = minimax_h3.build_video_request(
+            prompt="Show the product",
+            resolution="768P",
+            duration=11,
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "result.mp4"
+            with self.assertRaisesRegex(minimax_h3.ApiError, "not an MP4"):
+                minimax_h3.generate_video(
+                    client,
+                    request,
+                    output,
+                    poll_interval=0,
+                    timeout=5,
+                )
+            self.assertFalse(output.exists())
 
     def test_list_supports_official_filters(self):
         client = minimax_h3.MiniMaxClient(self.server.base_url, "secret-for-test")

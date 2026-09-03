@@ -43,7 +43,7 @@ class WorkflowFetchTests(unittest.TestCase):
             return FakeResponse(workflow_payload)
 
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "h3.original.json"
+            output = Path(directory) / "h3.workflow.json"
             result = fetcher.fetch_saved_workflow(
                 output,
                 "http://comfy.example:8188/",
@@ -61,7 +61,7 @@ class WorkflowFetchTests(unittest.TestCase):
             return FakeResponse(json.dumps(["other.json"]).encode())
 
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "h3.original.json"
+            output = Path(directory) / "h3.workflow.json"
             with self.assertRaisesRegex(fetcher.WorkflowFetchError, "未找到指定工作流"):
                 fetcher.fetch_saved_workflow(output, opener=opener)
             self.assertFalse(output.exists())
@@ -78,7 +78,7 @@ class WorkflowFetchTests(unittest.TestCase):
             return FakeResponse(next(responses))
 
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "h3.original.json"
+            output = Path(directory) / "h3.workflow.json"
             with self.assertRaisesRegex(fetcher.WorkflowFetchError, "缺少 nodes"):
                 fetcher.fetch_saved_workflow(output, opener=opener)
             self.assertFalse(output.exists())
