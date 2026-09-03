@@ -4,6 +4,8 @@
 
 主路走你自己的 ComfyUI（[comfy-mcp](https://github.com/Comfy-Org/comfy-mcp)），连不上再走 MiniMax 按量 API。
 
+API 备选链路由插件内置的零第三方依赖 Python 客户端直接调用 MiniMax 官方 Video Generation V2 API，不依赖 `mmx-cli`。默认使用国区官方 `https://api.minimax.cn`；国际账号才设置 `MINIMAX_REGION=global`。付费创建任务时必须明确选择 `768P` 或 `2K`；客户端提交前显示真实请求规格，成功后再核对返回的分辨率与时长。使用备选链路前，请在宿主环境安全配置 `MINIMAX_API_KEY`；不要把密钥写进仓库或发到聊天中。
+
 ## 安装
 
 把这段发给 AI：
@@ -57,4 +59,4 @@ COMFYUI_URL = "http://127.0.0.1:8188"
 
 ## License
 
-[MIT](LICENSE)。`h3-prompt-writing` 与 `mmx-h3-video` 为 MiniMax 官方技能原文。
+[MIT](LICENSE)。`h3-prompt-writing` 来源于 MiniMax 官方技能；`minimax-h3-api` 是本插件基于 MiniMax 官方 V2 API 维护的调用适配层。

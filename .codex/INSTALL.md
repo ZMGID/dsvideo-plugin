@@ -55,7 +55,7 @@ pip install comfy-mcp "comfy-cli>=1.14.0"
 
 - **ecom-h3-video** — 流水线入口：收集产品图 / 卖点 / 规格 → 写 H3 提示词 → 主路 Comfy / 备选 API
 - **h3-prompt-writing** — MiniMax-H3 提示词结构（上游原文）
-- **mmx-h3-video** — MiniMax 按量 API 备选（上游原文）
+- **minimax-h3-api** — 插件内置的 MiniMax 官方 V2 按量 API 备选，显式支持 `768P` / `2K`，不依赖 `mmx-cli`
 
 ## 验证
 
@@ -63,7 +63,7 @@ pip install comfy-mcp "comfy-cli>=1.14.0"
 ls -la ~/.agents/skills/dsvideo-plugin
 ```
 
-应看到指向 `~/.codex/dsvideo-plugin/skills` 的符号链接（Windows 上为 junction），其下有 `ecom-h3-video`、`h3-prompt-writing`、`mmx-h3-video`。
+应看到指向 `~/.codex/dsvideo-plugin/skills` 的符号链接（Windows 上为 junction），其下有 `ecom-h3-video`、`h3-prompt-writing`、`minimax-h3-api`。
 
 ## 更新
 

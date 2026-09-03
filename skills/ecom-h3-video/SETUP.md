@@ -44,6 +44,8 @@ COMFYUI_URL = "<用户给的地址>"
 
 不要把 URL 以外的密钥写进仓库；聊天里不要回显 API key。
 
+MiniMax 按量 API 只是 ComfyUI 失败后的备选链路，不要求安装 `mmx-cli`。第一次使用该备选链路前，让用户在宿主环境中安全设置 `MINIMAX_API_KEY`。插件默认国区，通过官方 `https://api.minimax.cn` 调用；只有国际账号才设置 `MINIMAX_REGION=global`。每次付费创建任务都必须明确选择 `768P` 或 `2K`，插件不会默认分辨率。不要代用户把 API key 写进本仓库、插件缓存或聊天记录。
+
 ## 3. 收尾
 
 告诉用户：装好了；ComfyUI 指向哪；重启 Codex / 新开 Claude 会话；开口把产品图和卖点丢过来即可。

@@ -7,3 +7,5 @@ Desktop.ini
 .idea/
 .vscode/
 *.orig
+__pycache__/
+*.py[cod]
