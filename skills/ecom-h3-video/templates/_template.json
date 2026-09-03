@@ -1,0 +1,32 @@
+{
+  "template": true,
+  "id": "replace-with-short-id",
+  "name": "替换为模板名称",
+  "match": {
+    "display_method": ["穿戴、携带、操作、材质细节或组合展示"],
+    "shot_goal": "主要展示目标",
+    "reference_images": 1,
+    "include_when": ["适用特征"],
+    "exclude_when": ["不适用特征"]
+  },
+  "spec": {
+    "duration_seconds": 10,
+    "aspect_ratio": "9:16",
+    "workflow_mode": "single-image-reference"
+  },
+  "shots": [
+    {
+      "time": "0-3s",
+      "purpose": "商品全貌",
+      "action": "使用可替换的商品动作描述",
+      "camera": "使用已经验证的镜头描述"
+    }
+  ],
+  "prompt_pattern": "保留已验证的 H3 提示词骨架，用明确占位说明可替换内容。",
+  "product_truth_constraints": ["不得改变商品身份和可见结构"],
+  "validated_from": {
+    "user_approved": true,
+    "date": "YYYY-MM-DD",
+    "note": "简短记录验证结果"
+  }
+}
