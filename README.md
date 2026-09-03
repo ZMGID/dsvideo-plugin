@@ -4,6 +4,8 @@
 
 主路走你自己的 ComfyUI（[comfy-mcp](https://github.com/Comfy-Org/comfy-mcp)），连不上再走 MiniMax 按量 API。
 
+本地 ComfyUI 已有工作流时，插件以该工作流为权威源，只在一次性副本中替换提示词、输入图片/视频、视频宽高/比例和时长；模型、`video_steps`、CFG、采样器、调度器等参数默认锁定，排队前通过差异白名单检查，原工作流文件不会被覆盖。
+
 API 备选链路由插件内置的零第三方依赖 Python 客户端直接调用 MiniMax 官方 Video Generation V2 API，不依赖 `mmx-cli`。默认使用国区官方 `https://api.minimax.cn`；国际账号才设置 `MINIMAX_REGION=global`。付费创建任务时必须明确选择 `768P` 或 `2K`；客户端提交前显示真实请求规格，成功后再核对返回的分辨率与时长。使用备选链路前，请在宿主环境安全配置 `MINIMAX_API_KEY`；不要把密钥写进仓库或发到聊天中。
 
 ## 安装
