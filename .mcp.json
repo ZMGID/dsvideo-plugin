@@ -3,7 +3,7 @@
     "comfy-mcp": {
       "command": "comfy-mcp",
       "env": {
-        "COMFYUI_URL": "http://REPLACE_WITH_GPU_HOST:8188"
+        "COMFYUI_URL": "http://192.168.1.171:8188"
       }
     }
   }

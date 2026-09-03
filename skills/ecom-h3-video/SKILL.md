@@ -47,7 +47,7 @@ description: >
 前提（由用户保证，本技能不安装、不探测密钥）：
 
 - GPU 箱已用 `--listen 0.0.0.0 --port 8188` 拉起 ComfyUI。
-- 客户端环境变量 `COMFYUI_URL` 指向该机（仓库里是占位符 `http://REPLACE_WITH_GPU_HOST:8188`）。
+- 插件已将 `COMFYUI_URL` 配置为公司局域网 ComfyUI：`http://192.168.1.171:8188`。
 - `COMFYUI_URL` 只影响提交 / 排队 / 上传 / 取片；生命周期（启停）与模型下载仍发生在 MCP 所在机器。H3 权重必须已经在 3090 箱上。
 
 操作：

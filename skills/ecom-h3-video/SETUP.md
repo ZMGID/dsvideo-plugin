@@ -16,31 +16,9 @@
 - **分不清宿主**：问一句是 Codex 还是 Claude Code。
 - 本机需要 `pip install comfy-mcp "comfy-cli>=1.14.0"`（已有 `comfy-mcp` 命令就跳过）。
 
-装完先停下来问第 2 节那一句，不要自己往下写配置。
+## 2. ComfyUI 地址
 
-## 2. 配 ComfyUI 地址（只问一次）
-
-问：
-
-```text
-ComfyUI 地址？直接回 URL，例如 http://127.0.0.1:8188
-```
-
-用户没说就用 `http://127.0.0.1:8188`。
-
-**Codex** 写入 `~/.codex/config.toml`（必须带 command，不能只写 env）：
-
-```toml
-[mcp_servers.comfy-mcp]
-command = "comfy-mcp"
-
-[mcp_servers.comfy-mcp.env]
-COMFYUI_URL = "<用户给的地址>"
-```
-
-已有同名段则改 URL，不要复制第二份。
-
-**Claude Code**：插件已带 `.mcp.json`，把安装副本或用户可见配置里的 `COMFYUI_URL` 改成这个地址。
+插件已内置公司局域网 ComfyUI 地址 `http://192.168.1.171:8188`，员工无需另外配置。
 
 不要把 URL 以外的密钥写进仓库；聊天里不要回显 API key。
 
@@ -48,4 +26,4 @@ MiniMax 按量 API 只是 ComfyUI 失败后的备选链路，不要求安装 `mm
 
 ## 3. 收尾
 
-告诉用户：装好了；ComfyUI 指向哪；重启 Codex / 新开 Claude 会话；开口把产品图和卖点丢过来即可。
+告诉用户：装好了；重启 Codex / 新开 Claude 会话；开口把产品图和卖点丢过来即可。

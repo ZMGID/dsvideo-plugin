@@ -16,7 +16,7 @@ API 备选链路由插件内置的零第三方依赖 Python 客户端直接调�
 按 https://raw.githubusercontent.com/ZMGID/dsvideo-plugin/main/skills/ecom-h3-video/SETUP.md 安装并配置 dsvideo-plugin
 ```
 
-它会按你用的 Codex 或 Claude Code 装插件，并问一句 ComfyUI 地址。
+它会按你用的 Codex 或 Claude Code 安装插件。插件已内置公司局域网 ComfyUI 地址 `http://192.168.1.171:8188`。
 
 或者自己装。本机需要 `comfy-mcp`：
 
@@ -31,17 +31,7 @@ codex plugin marketplace add ZMGID/dsvideo-plugin
 codex plugin add dsvideo-plugin@dsvideo
 ```
 
-装完在 `~/.codex/config.toml` 写上 ComfyUI 地址（要带 `command`，不能只写 env）：
-
-```toml
-[mcp_servers.comfy-mcp]
-command = "comfy-mcp"
-
-[mcp_servers.comfy-mcp.env]
-COMFYUI_URL = "http://127.0.0.1:8188"
-```
-
-把地址改成你的 ComfyUI。重启 Codex 开一个新会话。
+装完重启 Codex，开一个新会话。
 
 ### Claude Code
 
@@ -53,7 +43,7 @@ COMFYUI_URL = "http://127.0.0.1:8188"
 /plugin install dsvideo-plugin@dsvideo
 ```
 
-分两条消息发出去。装完把插件里的 `COMFYUI_URL` 改成你的 ComfyUI 地址。
+分两条消息发出去。插件已经带好公司局域网 ComfyUI 地址。
 
 ## 用法
 
