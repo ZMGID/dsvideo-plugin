@@ -30,14 +30,14 @@ class PrepareWorkflowTests(unittest.TestCase):
             megapixels=megapixels,
         )
 
-    def test_default_megapixels_is_point_four_for_every_branch(self):
+    def test_default_megapixels_is_point_five_for_every_branch(self):
         cases = [([], 235), (["product.png"], 313), (["front.png", "back.png"], 340)]
 
         for images, resolution_node in cases:
             with self.subTest(images=len(images)):
                 workflow = self.prepare(images)
-                self.assertEqual(nodes(workflow)[resolution_node]["widgets_values"][1], 0.4)
-                self.assertEqual(workflow["extra"]["dsvideo"]["megapixels"], 0.4)
+                self.assertEqual(nodes(workflow)[resolution_node]["widgets_values"][1], 0.5)
+                self.assertEqual(workflow["extra"]["dsvideo"]["megapixels"], 0.5)
 
     def test_explicit_megapixels_overrides_the_default(self):
         workflow = self.prepare(["product.png"], megapixels=0.8)

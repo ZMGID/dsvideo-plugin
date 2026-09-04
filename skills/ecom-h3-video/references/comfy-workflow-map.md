@@ -21,7 +21,13 @@
 
 节点 215 `Fast Groups Bypasser (rgthree)` 只用于前端切换。准备脚本直接切换三组节点的 `mode`，并在输出中移除节点 215、Markdown 说明节点、未接线的音频节点及未使用的第三张图片节点。
 
-三个分支的 `ResolutionSelector` 默认都由准备脚本明确写入 `megapixels=0.4`，这是清晰度与生成开销的实测平衡值。仅当用户明确要求其他百万像素值时，才通过 `--megapixels` 覆盖。
+设置 ComfyUI 分辨率时先查看内置工作流中的 `Note: Size Settings Reference` 对照表。三个分支的 `ResolutionSelector` 默认都由准备脚本明确写入 `megapixels=0.5`；16:9 时对应约 `960×544`。仅当用户明确要求其他百万像素值或输出尺寸时，才按对照表通过 `--megapixels` 覆盖。
+
+## 生成后释放内存
+
+本地任务进入终态后运行 `scripts/free_comfy_memory.py`。脚本先读取 `/queue`；还有正在运行或等待的连续任务时跳过，只有 `queue_running` 和 `queue_pending` 都为空时才向 `/free` 发送 `unload_models=true` 与 `free_memory=true`。这一步独立于工作流节点，不需要给固定工作流增加第三方卸载节点，也不会覆盖服务器保存的工作流。
+
+局域网 ComfyUI 可能被多人共用，绝不能为释放内存中断队列中的任务。`/free` 失败不影响已经下载的成片，只单独报告清理失败。普通清理后若 H3/AIMDO 主机缓冲区仍长期占用大量内存，才建议用户正常重启 ComfyUI；不要由插件自动结束服务器进程。
 
 ## 刷新
 

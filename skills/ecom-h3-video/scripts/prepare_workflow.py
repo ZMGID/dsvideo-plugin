@@ -11,7 +11,7 @@ from typing import Any
 
 
 DEFAULT_WORKFLOW = Path(__file__).parents[1] / "assets" / "minimax-h3-workflow.json"
-DEFAULT_MEGAPIXELS = 0.4
+DEFAULT_MEGAPIXELS = 0.5
 
 BRANCHES = {
     "text": {
