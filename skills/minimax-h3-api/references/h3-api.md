@@ -8,12 +8,13 @@ Read this file before sending a paid request or recovering an existing task.
 - [查询任务](https://platform.minimaxi.com/docs/api-reference/video-generation-v2-query)
 - [查询任务列表](https://platform.minimaxi.com/docs/api-reference/video-generation-v2-list)
 - [Pay-as-you-go pricing](https://platform.minimaxi.com/docs/guides/pricing-paygo)
+- [Official CLI balance endpoint](https://github.com/MiniMax-AI/cli/blob/main/src/client/endpoints.ts)
 
 ## Credentials And Region
 
 - H3 requires a Pay-as-you-go/Credit API key, not an OAuth or Token Plan subscription credential.
 - The bundled client reads the key only from `MINIMAX_API_KEY` and sends it as a Bearer credential.
-- It reads the region from `MINIMAX_REGION`: `cn` uses the official `https://api.minimax.cn`; `global` uses `https://api.minimax.io`. When neither the environment nor `--region` selects a region, the client defaults to `cn`.
+- It reads the region from `MINIMAX_REGION`: `cn` uses the official `https://api.minimaxi.com`; `global` uses `https://api.minimax.io`. When neither the environment nor `--region` selects a region, the client defaults to `cn`.
 - `MINIMAX_API_BASE` is an advanced endpoint override. Do not use it unless the user explicitly configured a compatible gateway or a local test server.
 - Never put a key in a command, repository file, skill file, shell transcript, or final response. If no secure environment value is available, ask the user to configure it outside chat.
 
@@ -35,7 +36,8 @@ Once a task ID exists, all recovery must use that ID. A polling timeout, termina
 - `resolution` is required by the official create API. For `MiniMax-H3`, select exactly `768P` or `2K`; the client has no default.
 - Before the POST, the client prints the actual `model`, `resolution`, output duration, ratio, and input mode that it will submit. Check these fields against the user's request.
 - A successful task response must report the same resolution and duration. The client stops before download if either field is missing or mismatched, retaining the task ID for diagnosis without another paid submission.
-- Pricing changes independently of this plugin. Check the official [Pay-as-you-go pricing](https://platform.minimaxi.com/docs/guides/pricing-paygo) when quoting cost; the runtime deliberately does not embed a price table.
+- The China-region price snapshot checked on 2026-09-03 is `¥0.50/output second` for `768P` and `¥0.80/output second` for `2K`. Reference audio is free; up to 5 reference images are free and each additional image costs `¥0.20`; reference-video input seconds use the selected output resolution's per-second rate. The `quote` command applies these CNY rules only to `cn` accounts and must link the official [Pay-as-you-go pricing](https://platform.minimaxi.com/docs/guides/pricing-paygo). Treat its result as an estimate because pricing may change. Never relabel or reuse it as a `global` USD estimate; without a reliable current international quote, stop before paid creation.
+- The `balance` command calls `GET /account/query_balance`, the read-only balance route used by MiniMax's official CLI. It does not create a video task.
 
 ## Input Modes
 
@@ -64,6 +66,13 @@ Dry-run request construction without a key or charge:
 
 ```text
 python <script> generate --prompt "<prompt>" --resolution 768P --duration 5 --ratio 9:16 --output result.mp4 --dry-run
+```
+
+Balance and estimates before route selection:
+
+```text
+python <script> balance
+python <script> quote --duration 10 --reference-image-count 1 --reference-video-seconds 0
 ```
 
 Completed text-to-video:

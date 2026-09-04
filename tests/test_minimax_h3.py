@@ -1,9 +1,11 @@
 import importlib.util
+import io
 import json
 import os
 import tempfile
 import threading
 import unittest
+from contextlib import redirect_stdout
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import SimpleNamespace
@@ -28,7 +30,7 @@ class RequestTests(unittest.TestCase):
         args = SimpleNamespace(base_url=None, region=None)
 
         with patch.dict(os.environ, {}, clear=True):
-            self.assertEqual(minimax_h3._base_url(args), "https://api.minimax.cn")
+            self.assertEqual(minimax_h3._base_url(args), "https://api.minimaxi.com")
 
     def test_global_region_uses_official_global_endpoint(self):
         args = SimpleNamespace(base_url=None, region="global")
@@ -138,10 +140,33 @@ class RequestTests(unittest.TestCase):
 
         self.assertEqual(minimax_h3.paid_request_summary(request)["mode"], "last-frame")
 
+    def test_cost_quote_shows_both_resolutions(self):
+        quote = minimax_h3.cost_quote(duration=10, reference_image_count=1)
+
+        self.assertEqual(quote["estimated_cost"], {"768P": "5.00", "2K": "8.00"})
+
+    def test_quote_command_does_not_require_an_api_key(self):
+        output = io.StringIO()
+        with patch.dict(os.environ, {}, clear=True), redirect_stdout(output):
+            exit_code = minimax_h3.main(["quote", "--duration", "10"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(json.loads(output.getvalue())["estimated_cost"]["2K"], "8.00")
+
+    def test_cost_quote_includes_paid_images_and_reference_video(self):
+        quote = minimax_h3.cost_quote(
+            duration=10,
+            reference_image_count=7,
+            reference_video_seconds="2.5",
+        )
+
+        self.assertEqual(quote["estimated_cost"], {"768P": "6.65", "2K": "10.40"})
+
 
 class _ApiHandler(BaseHTTPRequestHandler):
     create_count = 0
     query_count = 0
+    balance_query_count = 0
     request_body = None
     video_bytes = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2"
     fail_task = False
@@ -159,6 +184,18 @@ class _ApiHandler(BaseHTTPRequestHandler):
         self._json({"task_id": "task-123"})
 
     def do_GET(self):
+        if self.path == "/account/query_balance":
+            type(self).balance_query_count += 1
+            self._json(
+                {
+                    "available_amount": "98.00",
+                    "cash_balance": "20.00",
+                    "voucher_balance": "78.00",
+                    "credit_balance": "0.00",
+                    "owed_amount": "0.00",
+                }
+            )
+            return
         if self.path.startswith("/v2/query/video_generation?"):
             type(self).list_query = parse_qs(urlparse(self.path).query)
             self._json({"items": [], "total": 0})
@@ -209,6 +246,7 @@ class ClientTests(unittest.TestCase):
     def setUp(self):
         _ApiHandler.create_count = 0
         _ApiHandler.query_count = 0
+        _ApiHandler.balance_query_count = 0
         _ApiHandler.request_body = None
         _ApiHandler.video_bytes = b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2"
         _ApiHandler.fail_task = False
@@ -251,6 +289,15 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(_ApiHandler.request_body["model"], "MiniMax-H3")
         self.assertEqual(_ApiHandler.request_body["resolution"], "768P")
         self.assertEqual(_ApiHandler.request_body["duration"], 11)
+
+    def test_balance_query_is_read_only(self):
+        client = minimax_h3.MiniMaxClient(self.server.base_url, "secret-for-test")
+
+        balance = client.get_balance()
+
+        self.assertEqual(balance["available_amount"], "98.00")
+        self.assertEqual(_ApiHandler.balance_query_count, 1)
+        self.assertEqual(_ApiHandler.create_count, 0)
 
     def test_failed_task_is_not_resubmitted(self):
         _ApiHandler.fail_task = True

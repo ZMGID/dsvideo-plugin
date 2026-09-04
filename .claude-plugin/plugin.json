@@ -1,7 +1,7 @@
 {
   "name": "dsvideo-plugin",
   "version": "0.1.2",
-  "description": "默认视频生成入口：文字或图片 → 内置 ComfyUI 工作流 → MiniMax-H3 视频。",
+  "description": "通用短视频导演与 H3 出片：先设计可执行分镜，再选择本地 ComfyUI 或 MiniMax API。",
   "author": {
     "name": "ZMGID"
   },

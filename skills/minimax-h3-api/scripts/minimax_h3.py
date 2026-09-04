@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import time
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Callable, Iterable
 from urllib.error import HTTPError, URLError
@@ -23,8 +24,14 @@ RESOLUTIONS = ("768P", "2K")
 TERMINAL_FAILURES = {"failed", "cancelled", "expired"}
 REGION_BASE_URLS = {
     "global": "https://api.minimax.io",
-    "cn": "https://api.minimax.cn",
+    "cn": "https://api.minimaxi.com",
 }
+OUTPUT_PRICE_CNY_PER_SECOND = {
+    "768P": Decimal("0.50"),
+    "2K": Decimal("0.80"),
+}
+EXTRA_IMAGE_PRICE_CNY = Decimal("0.20")
+PRICING_URL = "https://platform.minimaxi.com/docs/guides/pricing-paygo#%E8%A7%86%E9%A2%91"
 MEDIA = {
     "image": {
         "extensions": {
@@ -222,6 +229,12 @@ class MiniMaxClient:
             raise ApiError("MiniMax accepted the request but returned no task_id.")
         return task_id
 
+    def get_balance(self) -> dict[str, Any]:
+        response = self._request("GET", "/account/query_balance")
+        if response.get("available_amount") is None:
+            raise ApiError("MiniMax returned no available account balance.")
+        return response
+
     def get_task(self, task_id: str) -> dict[str, Any]:
         response = self._request("GET", f"/v2/query/video_generation/{quote(task_id, safe='')}")
         task = response.get("task")
@@ -321,6 +334,52 @@ def paid_request_summary(payload: dict[str, Any]) -> dict[str, Any]:
         "duration_seconds": payload.get("duration"),
         "ratio": payload.get("ratio"),
         "mode": mode,
+    }
+
+
+def estimate_cost_cny(
+    *,
+    resolution: str,
+    duration: int,
+    reference_image_count: int = 0,
+    reference_video_seconds: Decimal | int | str = 0,
+) -> Decimal:
+    if resolution not in RESOLUTIONS:
+        raise ValueError(f"Resolution must be one of: {', '.join(RESOLUTIONS)}.")
+    if isinstance(duration, bool) or not isinstance(duration, int) or not 4 <= duration <= 15:
+        raise ValueError("MiniMax-H3 duration must be an integer from 4 to 15 seconds.")
+    if not 0 <= reference_image_count <= 9:
+        raise ValueError("Reference image count must be from 0 to 9.")
+    video_seconds = Decimal(str(reference_video_seconds))
+    if not video_seconds.is_finite() or not 0 <= video_seconds <= 15:
+        raise ValueError("Reference video seconds must be from 0 to 15.")
+
+    rate = OUTPUT_PRICE_CNY_PER_SECOND[resolution]
+    extra_images = max(0, reference_image_count - 5)
+    return (
+        rate * Decimal(duration)
+        + rate * video_seconds
+        + EXTRA_IMAGE_PRICE_CNY * Decimal(extra_images)
+    )
+
+
+def cost_quote(
+    *,
+    duration: int,
+    reference_image_count: int = 0,
+    reference_video_seconds: Decimal | int | str = 0,
+) -> dict[str, Any]:
+    estimates = {
+        resolution: f"{estimate_cost_cny(resolution=resolution, duration=duration, reference_image_count=reference_image_count, reference_video_seconds=reference_video_seconds):.2f}"
+        for resolution in RESOLUTIONS
+    }
+    return {
+        "currency": "CNY",
+        "duration_seconds": duration,
+        "reference_image_count": reference_image_count,
+        "reference_video_seconds": str(Decimal(str(reference_video_seconds))),
+        "estimated_cost": estimates,
+        "pricing_url": PRICING_URL,
     }
 
 
@@ -496,7 +555,9 @@ def _request_from_args(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
-def _print_json(value: Any, *, stream: Any = sys.stdout) -> None:
+def _print_json(value: Any, *, stream: Any = None) -> None:
+    if stream is None:
+        stream = sys.stdout
     print(json.dumps(value, ensure_ascii=False, indent=2), file=stream, flush=True)
 
 
@@ -538,6 +599,13 @@ def build_parser() -> argparse.ArgumentParser:
     listing.add_argument("--task-id", action="append", default=[])
     listing.add_argument("--model")
     listing.add_argument("--task-type", choices=("generation", "h3_context_ir", "regeneration"))
+
+    subparsers.add_parser("balance", help="show the current pay-as-you-go account balance")
+
+    quote_command = subparsers.add_parser("quote", help="estimate H3 cost without creating a task")
+    quote_command.add_argument("--duration", type=int, required=True)
+    quote_command.add_argument("--reference-image-count", type=int, default=0)
+    quote_command.add_argument("--reference-video-seconds", type=Decimal, default=Decimal("0"))
 
     wait = subparsers.add_parser("wait", help="wait for an existing task without creating another")
     wait.add_argument("task_id")
@@ -586,8 +654,30 @@ def main(argv: list[str] | None = None) -> int:
             _print_json(result)
             return 0
 
+        if args.command == "quote":
+            _print_json(
+                cost_quote(
+                    duration=args.duration,
+                    reference_image_count=args.reference_image_count,
+                    reference_video_seconds=args.reference_video_seconds,
+                )
+            )
+            return 0
+
         client = _client(args)
-        if args.command == "status":
+        if args.command == "balance":
+            balance = client.get_balance()
+            _print_json(
+                {
+                    "currency": "USD" if _base_url(args).endswith("minimax.io") else "CNY",
+                    "available_amount": balance["available_amount"],
+                    "cash_balance": balance.get("cash_balance"),
+                    "voucher_balance": balance.get("voucher_balance"),
+                    "credit_balance": balance.get("credit_balance"),
+                    "owed_amount": balance.get("owed_amount"),
+                }
+            )
+        elif args.command == "status":
             _print_json(client.get_task(args.task_id))
         elif args.command == "list":
             if args.page < 1 or not 1 <= args.page_size <= 100:

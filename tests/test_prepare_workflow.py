@@ -1,6 +1,7 @@
 import copy
 import importlib.util
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -41,6 +42,34 @@ class PrepareWorkflowTests(unittest.TestCase):
         self.assertEqual(mapped[235]["widgets_values"][0], "9:16 (Portrait Widescreen)")
         self.assertNotIn(215, mapped)
         self.assertFalse(any(node["type"] == "MarkdownNote" for node in workflow["nodes"]))
+
+    def test_source_asset_excludes_deprecated_prompt_notes(self):
+        deprecated_ids = {243, 244, 245, 310, 311, 315, 337, 338, 342}
+        self.assertTrue(deprecated_ids.isdisjoint(nodes(ORIGINAL)))
+
+    def test_cli_refuses_to_overwrite_source_workflow(self):
+        with tempfile.TemporaryDirectory() as directory:
+            workflow = Path(directory) / "workflow.json"
+            original = json.dumps(ORIGINAL, ensure_ascii=False)
+            workflow.write_text(original, encoding="utf-8")
+
+            exit_code = preparer.main(
+                [
+                    "--workflow",
+                    str(workflow),
+                    "--prompt",
+                    "Show the product clearly.",
+                    "--duration",
+                    "10",
+                    "--ratio",
+                    "9:16",
+                    "--output",
+                    str(workflow),
+                ]
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertEqual(workflow.read_text(encoding="utf-8"), original)
 
     def test_one_image_activates_single_ref2va(self):
         workflow = self.prepare(["uploaded/product.png"])

@@ -1,0 +1,7 @@
+interface:
+  display_name: "通用短视频导演"
+  short_description: "把故事或图片编排成可执行的短视频导演方案"
+  default_prompt: "Use $video-director to turn this idea or image into a clear short-video directing plan."
+
+policy:
+  allow_implicit_invocation: true

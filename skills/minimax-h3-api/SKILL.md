@@ -9,17 +9,21 @@ Use the bundled `scripts/minimax_h3.py` client. It has no third-party Python dep
 
 Before a paid request, read [references/h3-api.md](references/h3-api.md) for credentials, input constraints, task recovery, and failure handling.
 
+Before presenting the API route for a new video, run `quote` for both resolution estimates and `balance` for the current pay-as-you-go balance. These commands do not create a video task. The bundled quote is a CNY estimate for `cn` accounts only; never present it as a USD or `global` estimate.
+
 ## Required Rules
 
-1. Use a Pay-as-you-go API key supplied through `MINIMAX_API_KEY`. Never print, repeat, save, or place a literal key in a command.
-2. Select `global` or `cn` with `MINIMAX_REGION`. This plugin defaults to `cn`, using the official `https://api.minimax.cn` endpoint; use `global` only when the user explicitly has an international API account.
-3. Obtain an explicit `768P` or `2K` choice from the user for every paid create request. Never infer, default, upgrade, or downgrade the resolution.
-4. Run `--dry-run` first and check `model`, `resolution`, `duration`, `ratio`, and mode against the request. The paid command prints the same billable request summary immediately before its single POST.
-5. Run exactly one `generate` command when the user wants a completed file. The script submits once, prints the task ID immediately, polls that task, verifies the returned resolution and duration, and then downloads its result.
-6. If the terminal remains active, wait on that exact execution session. Do not submit another task.
-7. After a timeout or interruption, recover with `status` or `wait` and the existing task ID. Pass the originally requested resolution and duration to `wait` so the result contract is verified before download. Never create a replacement merely because polling or downloading stopped.
-8. Use `submit` only when the user explicitly wants an asynchronous task ID without waiting for a file.
-9. A dry run does not need credentials and cannot incur a charge, but it is not proof that the API key works or that a video was generated.
+1. Before constructing the final H3 prompt or running `--dry-run`, show the current user-readable video script and obtain explicit confirmation after it is displayed. Route choice, resolution choice, or an earlier request to generate does not confirm an unseen script. Any script or generation-spec change invalidates the confirmation and requires the revised script to be shown and confirmed again.
+2. Use a Pay-as-you-go API key supplied through `MINIMAX_API_KEY`. Never print, repeat, save, or place a literal key in a command.
+3. Select `global` or `cn` with `MINIMAX_REGION`. This plugin defaults to `cn`, using the official `https://api.minimaxi.com` endpoint; use `global` only when the user explicitly has an international API account.
+4. Obtain an explicit `768P` or `2K` choice from the user for every paid create request. Never infer, default, upgrade, or downgrade the resolution.
+5. Show the current balance with the currency returned by `balance` and the estimated cost before asking the user to choose the API route. If balance lookup fails, report that it is unavailable and still show the estimate. For `global`, stop before paid creation unless a reliable current international estimate is available; never reuse the bundled CNY quote. Never treat an estimate as the final charge.
+6. Run `--dry-run` first and check `model`, `resolution`, `duration`, `ratio`, and mode against the request. The paid command prints the same billable request summary immediately before its single POST.
+7. Run exactly one `generate` command when the user wants a completed file. The script submits once, prints the task ID immediately, polls that task, verifies the returned resolution and duration, and then downloads its result.
+8. If the terminal remains active, wait on that exact execution session. Do not submit another task.
+9. After a timeout or interruption, recover with `status` or `wait` and the existing task ID. Pass the originally requested resolution and duration to `wait` so the result contract is verified before download. Never create a replacement merely because polling or downloading stopped.
+10. Use `submit` only when the user explicitly wants an asynchronous task ID without waiting for a file.
+11. A dry run does not need credentials and cannot incur a charge, but it is not proof that the API key works or that a video was generated.
 
 ## Resolve The Client
 
@@ -46,6 +50,15 @@ python <skill-directory>/scripts/minimax_h3.py --region <global-or-cn> generate 
 
 For frame-based generation, add `--first-frame`, `--last-frame`, or both. For reference generation, repeat `--reference-image`, `--reference-video`, and `--reference-audio` once per input. Frame inputs and reference inputs cannot be mixed.
 
+## Balance And Estimate
+
+```text
+python <skill-directory>/scripts/minimax_h3.py balance
+python <skill-directory>/scripts/minimax_h3.py quote --duration <4-15> --reference-image-count <count> --reference-video-seconds <total-seconds>
+```
+
+`quote` returns both `768P` and `2K` estimates in CNY from the pricing snapshot documented in `references/h3-api.md`. It makes no network request and creates no task. `balance` performs only the official read-only account balance request and requires `MINIMAX_API_KEY`.
+
 The client converts supported local files to Data URIs. Public `http(s)` URLs, existing Data URIs, and `mm_file://` IDs are passed through. Use URLs or file IDs when Base64 would exceed the 64 MB request limit.
 
 ## Existing Tasks
@@ -60,4 +73,4 @@ V2 tasks remain queryable through the list endpoint for seven days. Retain the t
 
 ## Delivery
 
-For a completed request, verify that the reported local MP4 exists and is non-empty, then return its path, task ID, input mode, verified resolution, verified duration, ratio, and whether the paid API fallback was used. Do not describe submission or a running task as a completed video.
+For a completed request, verify that the reported local MP4 exists and is non-empty, then return its path, task ID, input mode, verified resolution, verified duration, ratio, and that the user selected the paid API route. Do not describe submission or a running task as a completed video.

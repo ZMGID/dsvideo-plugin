@@ -6,7 +6,7 @@
 
 - 插件资产：`assets/minimax-h3-workflow.json`
 - 来源工作流：`【Work-Fisher】Minimax-H3 整合流程.json`
-- 保存时结构：ComfyUI UI 格式，82 个节点，三条并行分支
+- 保存时结构：ComfyUI UI 格式，73 个节点，三条并行分支
 - 局域网 ComfyUI：`http://192.168.1.171:8188`
 
 ## 自动分支

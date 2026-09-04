@@ -217,10 +217,14 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        workflow_path = args.workflow.expanduser().resolve()
+        output = args.output.expanduser().resolve()
+        if output == workflow_path:
+            raise WorkflowPrepareError("The output path must differ from the source workflow path.")
         prompt = args.prompt
         if args.prompt_file:
             prompt = args.prompt_file.read_text(encoding="utf-8")
-        workflow = json.loads(args.workflow.read_text(encoding="utf-8-sig"))
+        workflow = json.loads(workflow_path.read_text(encoding="utf-8-sig"))
         prepared = prepare_workflow(
             workflow,
             prompt=prompt,
@@ -229,11 +233,10 @@ def main(argv: list[str] | None = None) -> int:
             images=args.image,
             megapixels=args.megapixels,
         )
-        output = args.output.expanduser().resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(prepared, ensure_ascii=False, indent=2), encoding="utf-8")
         result = prepared["extra"]["dsvideo"] | {
-            "workflow": str(args.workflow.resolve()),
+            "workflow": str(workflow_path),
             "output": str(output),
             "nodes": len(prepared["nodes"]),
         }
