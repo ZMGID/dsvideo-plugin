@@ -5,6 +5,13 @@
       "env": {
         "COMFYUI_URL": "http://192.168.1.171:8188"
       }
+    },
+    "video-analyzer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-video-analyzer@0.10.0"
+      ]
     }
   }
 }

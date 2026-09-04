@@ -1,0 +1,37 @@
+{
+  "reference_template": true,
+  "id": "replace-with-short-id",
+  "name": "替换为参考模板名称",
+  "source": {
+    "label": "便于追溯的来源名称",
+    "duration_seconds": 0,
+    "aspect_ratio": "9:16"
+  },
+  "fit": {
+    "content_types": ["适用的视频类型"],
+    "product_traits": ["适用的商品特征"],
+    "exclude_when": ["不适用的情况"]
+  },
+  "creative_formula": "与原商品、品牌和逐字文案解耦的一句话结构",
+  "timeline": [
+    {
+      "time": "0-2s",
+      "purpose": "该段作用",
+      "visual": "可替换的画面结构",
+      "action": "主体动作",
+      "camera": "景别与运镜",
+      "edit": "剪辑或转场",
+      "audio": "声音角色，不复制原音乐或逐字对白",
+      "text_role": "画面文字的作用，不复制原文案"
+    }
+  ],
+  "adaptation": {
+    "required_inputs": ["改编时需要的商品素材和信息"],
+    "must_keep": ["决定结构效果的关键机制"],
+    "may_change": ["可以按商品调整的部分"],
+    "do_not_copy": ["原品牌、人物、逐字文案、音乐和未经验证的卖点"]
+  },
+  "evidence_notes": ["工具警告、缺失信息或推断边界"],
+  "confirmed_by_user": true,
+  "saved_at": "YYYY-MM-DD"
+}

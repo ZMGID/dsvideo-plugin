@@ -13,10 +13,10 @@ Read this file before sending a paid request or recovering an existing task.
 ## Credentials And Region
 
 - H3 requires a Pay-as-you-go/Credit API key, not an OAuth or Token Plan subscription credential.
-- The bundled client reads the key only from `MINIMAX_API_KEY` and sends it as a Bearer credential.
+- The bundled client reads the key from the current user's `dsvideo/providers.json`; `MINIMAX_API_KEY` remains a legacy override. It sends the key as a Bearer credential.
 - It reads the region from `MINIMAX_REGION`: `cn` uses the official `https://api.minimaxi.com`; `global` uses `https://api.minimax.io`. When neither the environment nor `--region` selects a region, the client defaults to `cn`.
 - `MINIMAX_API_BASE` is an advanced endpoint override. Do not use it unless the user explicitly configured a compatible gateway or a local test server.
-- Never put a key in a command, repository file, skill file, shell transcript, or final response. If no secure environment value is available, ask the user to configure it outside chat.
+- Never put a key in a command, repository file, skill file, shell transcript, or final response. If no saved key is available, run `scripts/dsvideo_config.py set-minimax` and let the user enter it through the hidden prompt.
 
 ## API Lifecycle
 
@@ -117,7 +117,7 @@ python <script> list --status succeeded --task-id <task-id> --model MiniMax-H3 -
 
 | Failure | Action |
 |---|---|
-| Missing key | Ask the user to configure `MINIMAX_API_KEY` securely; do not ask them to paste it into chat. |
+| Missing key | Run the plugin's `scripts/dsvideo_config.py set-minimax` flow and use hidden input. |
 | HTTP 401/403 or code 1004/2049 | Stop. Check the configured region and key outside the paid create path. |
 | HTTP 402 or code 1008 | Stop and report insufficient balance. |
 | HTTP 422 or code 1026/1027 | Report the rejected prompt/media and ask the user to revise it; do not silently rewrite. |

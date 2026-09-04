@@ -26,6 +26,29 @@ SPEC.loader.exec_module(minimax_h3)
 
 
 class RequestTests(unittest.TestCase):
+    def test_saved_minimax_key_is_used(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config = Path(directory) / "providers.json"
+            config.write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "providers": {
+                            "minimax": {"type": "minimax-h3", "api_key": "saved-secret"}
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with patch.dict(
+                os.environ,
+                {"DSVIDEO_CONFIG_PATH": str(config)},
+                clear=True,
+            ):
+                client = minimax_h3._client(SimpleNamespace(base_url=None, region=None))
+
+        self.assertEqual(client.api_key, "saved-secret")
+
     def test_default_region_uses_official_cn_endpoint(self):
         args = SimpleNamespace(base_url=None, region=None)
 

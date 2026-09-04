@@ -14,7 +14,7 @@ Before presenting the API route for a new video, run `quote` for both resolution
 ## Required Rules
 
 1. Before constructing the final H3 prompt or running `--dry-run`, show the current user-readable video script and obtain explicit confirmation after it is displayed. Route choice, resolution choice, or an earlier request to generate does not confirm an unseen script. Any script or generation-spec change invalidates the confirmation and requires the revised script to be shown and confirmed again.
-2. Use a Pay-as-you-go API key supplied through `MINIMAX_API_KEY`. Never print, repeat, save, or place a literal key in a command.
+2. Use the Pay-as-you-go API key saved under `minimax` in the current user's `dsvideo/providers.json`; the legacy `MINIMAX_API_KEY` variable remains an override. Never print, repeat, or place a literal key in a command.
 3. Select `global` or `cn` with `MINIMAX_REGION`. This plugin defaults to `cn`, using the official `https://api.minimaxi.com` endpoint; use `global` only when the user explicitly has an international API account.
 4. Obtain an explicit `768P` or `2K` choice from the user for every paid create request. Never infer, default, upgrade, or downgrade the resolution.
 5. Show the current balance with the currency returned by `balance` and the estimated cost before asking the user to choose the API route. If balance lookup fails, report that it is unavailable and still show the estimate. For `global`, stop before paid creation unless a reliable current international estimate is available; never reuse the bundled CNY quote. Never treat an estimate as the final charge.
@@ -57,7 +57,7 @@ python <skill-directory>/scripts/minimax_h3.py balance
 python <skill-directory>/scripts/minimax_h3.py quote --duration <4-15> --reference-image-count <count> --reference-video-seconds <total-seconds>
 ```
 
-`quote` returns both `768P` and `2K` estimates in CNY from the pricing snapshot documented in `references/h3-api.md`. It makes no network request and creates no task. `balance` performs only the official read-only account balance request and requires `MINIMAX_API_KEY`.
+`quote` returns both `768P` and `2K` estimates in CNY from the pricing snapshot documented in `references/h3-api.md`. It makes no network request and creates no task. `balance` performs only the official read-only account balance request and requires the saved MiniMax key or the legacy `MINIMAX_API_KEY` override.
 
 The client converts supported local files to Data URIs. Public `http(s)` URLs, existing Data URIs, and `mm_file://` IDs are passed through. Use URLs or file IDs when Base64 would exceed the 64 MB request limit.
 

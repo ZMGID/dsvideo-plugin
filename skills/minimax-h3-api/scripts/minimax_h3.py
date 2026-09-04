@@ -16,6 +16,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
+PLUGIN_SCRIPTS = Path(__file__).resolve().parents[3] / "scripts"
+if str(PLUGIN_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(PLUGIN_SCRIPTS))
+
+from dsvideo_config import ConfigError, get_provider
+
 
 MODEL = "MiniMax-H3"
 MAX_REQUEST_BYTES = 64 * 1024 * 1024
@@ -217,7 +223,7 @@ def build_video_request(
 class MiniMaxClient:
     def __init__(self, base_url: str, api_key: str, *, request_timeout: float = 60) -> None:
         if not api_key:
-            raise ValueError("MINIMAX_API_KEY is not set.")
+            raise ValueError("MiniMax API key is not configured.")
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.request_timeout = request_timeout
@@ -537,7 +543,9 @@ def _base_url(args: argparse.Namespace) -> str:
 
 
 def _client(args: argparse.Namespace) -> MiniMaxClient:
-    return MiniMaxClient(_base_url(args), os.environ.get("MINIMAX_API_KEY", ""))
+    provider = get_provider("minimax")
+    api_key = os.environ.get("MINIMAX_API_KEY") or provider.get("api_key") or ""
+    return MiniMaxClient(_base_url(args), str(api_key))
 
 
 def _request_from_args(args: argparse.Namespace) -> dict[str, Any]:
@@ -734,7 +742,7 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 _print_json(task)
         return 0
-    except (ApiError, TimeoutError, ValueError) as error:
+    except (ApiError, ConfigError, TimeoutError, ValueError) as error:
         result: dict[str, Any] = {"error": str(error)}
         if isinstance(error, ApiError):
             if error.http_status is not None:

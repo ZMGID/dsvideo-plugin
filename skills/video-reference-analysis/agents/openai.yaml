@@ -1,0 +1,13 @@
+interface:
+  display_name: "参考视频分析"
+  short_description: "拆解视频并保存经确认的可复用电商创意结构"
+  default_prompt: "Use $video-reference-analysis to analyze this reference video and extract a reusable ecommerce structure."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "video-analyzer"
+      description: "Extracts video metadata, transcript, OCR, timeline, and key frames"
+
+policy:
+  allow_implicit_invocation: true
