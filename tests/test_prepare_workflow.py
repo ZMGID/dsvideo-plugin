@@ -20,14 +20,30 @@ def nodes(workflow):
 
 
 class PrepareWorkflowTests(unittest.TestCase):
-    def prepare(self, images=None):
+    def prepare(self, images=None, megapixels=preparer.DEFAULT_MEGAPIXELS):
         return preparer.prepare_workflow(
             copy.deepcopy(ORIGINAL),
             prompt="Show the product clearly.",
             duration=10,
             ratio="9:16",
             images=images or [],
+            megapixels=megapixels,
         )
+
+    def test_default_megapixels_is_point_four_for_every_branch(self):
+        cases = [([], 235), (["product.png"], 313), (["front.png", "back.png"], 340)]
+
+        for images, resolution_node in cases:
+            with self.subTest(images=len(images)):
+                workflow = self.prepare(images)
+                self.assertEqual(nodes(workflow)[resolution_node]["widgets_values"][1], 0.4)
+                self.assertEqual(workflow["extra"]["dsvideo"]["megapixels"], 0.4)
+
+    def test_explicit_megapixels_overrides_the_default(self):
+        workflow = self.prepare(["product.png"], megapixels=0.8)
+
+        self.assertEqual(nodes(workflow)[313]["widgets_values"][1], 0.8)
+        self.assertEqual(workflow["extra"]["dsvideo"]["megapixels"], 0.8)
 
     def test_text_input_activates_t2va_without_graph_analysis(self):
         workflow = self.prepare()

@@ -11,6 +11,7 @@ from typing import Any
 
 
 DEFAULT_WORKFLOW = Path(__file__).parents[1] / "assets" / "minimax-h3-workflow.json"
+DEFAULT_MEGAPIXELS = 0.4
 
 BRANCHES = {
     "text": {
@@ -138,7 +139,7 @@ def prepare_workflow(
     duration: float,
     ratio: str,
     images: list[str],
-    megapixels: float | None = None,
+    megapixels: float = DEFAULT_MEGAPIXELS,
 ) -> dict[str, Any]:
     if not prompt.strip():
         raise WorkflowPrepareError("Prompt must not be empty.")
@@ -173,10 +174,9 @@ def prepare_workflow(
     _set_widget(nodes[active["prompt"]], 0, prompt)
     _set_widget(nodes[active["duration"]], 0, duration)
     _set_widget(nodes[active["resolution"]], 0, RATIOS[ratio])
-    if megapixels is not None:
-        if not 0.1 <= megapixels <= 16:
-            raise WorkflowPrepareError("Megapixels must be from 0.1 to 16.")
-        _set_widget(nodes[active["resolution"]], 1, megapixels)
+    if not 0.1 <= megapixels <= 16:
+        raise WorkflowPrepareError("Megapixels must be from 0.1 to 16.")
+    _set_widget(nodes[active["resolution"]], 1, megapixels)
     _set_widget(nodes[active["conditioning"]], 4, active["task_type"])
 
     for node_id, filename in zip(active["images"], images):
@@ -195,6 +195,7 @@ def prepare_workflow(
         "task_type": active["task_type"],
         "duration_seconds": duration,
         "ratio": ratio,
+        "megapixels": megapixels,
         "reference_images": len(images),
     }
     return workflow
@@ -209,7 +210,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--duration", type=float, required=True)
     parser.add_argument("--ratio", choices=RATIOS, required=True)
     parser.add_argument("--image", action="append", default=[], help="server-side ComfyUI filename")
-    parser.add_argument("--megapixels", type=float)
+    parser.add_argument("--megapixels", type=float, default=DEFAULT_MEGAPIXELS)
     parser.add_argument("--output", type=Path, required=True)
     return parser
 

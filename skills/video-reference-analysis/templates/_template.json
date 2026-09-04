@@ -12,24 +12,54 @@
     "product_traits": ["适用的商品特征"],
     "exclude_when": ["不适用的情况"]
   },
-  "creative_formula": "与原商品、品牌和逐字文案解耦的一句话结构",
-  "timeline": [
+  "creative_formula": "与原商品、品牌和逐字文案解耦的一句话视觉结构",
+  "visible_text_and_audio": {
+    "overlays": [
+      {
+        "shot": 1,
+        "text": "原视频后期字幕或画面文案；没有则写无"
+      }
+    ],
+    "product_native_marks": ["商品本体或包装上的原生文字、Logo、图案"],
+    "speech": [
+      {
+        "shot": 1,
+        "content": "口播、对白或旁白；没有则写无"
+      }
+    ],
+    "generation_policy": "默认不生成后期字幕或文字覆盖层；按用户要求决定是否保留商品原生标识"
+  },
+  "shot_breakdown": [
     {
-      "time": "0-2s",
-      "purpose": "该段作用",
-      "visual": "可替换的画面结构",
-      "action": "主体动作",
-      "camera": "景别与运镜",
-      "edit": "剪辑或转场",
+      "shot": 1,
+      "time": "00:00-00:02",
+      "purpose": "该镜头在完整视频中的作用",
+      "video_copy": "原视频可见文案；没有则写无可见字幕或画面文案",
+      "subject": "主体、商品、动作、姿态和表情",
+      "environment": "地点、时间、天气、道具、背景元素和空间层次",
+      "art_style": "影像风格",
+      "composition_camera": "画幅、景别、机位、角度、镜头运动和景深",
+      "details_lighting": "光源、色温、材质、颜色、纹理和氛围",
       "audio": "声音角色，不复制原音乐或逐字对白",
-      "text_role": "画面文字的作用，不复制原文案"
+      "generation_prompt": "可直接使用的纯文本镜头提示词"
     }
   ],
+  "full_video_prompt": "按镜头顺序串联的完整、模型中立视频生成提示词",
+  "negative_prompt": "no added subtitles, text overlays, third-party logos, watermarks, stickers, distorted hands, distorted face, wrong body proportions, outfit deformation, product deformation, background jumps, plastic skin, unwanted 3D or cartoon style",
+  "storyboard": {
+    "aspect_ratio": "9:16",
+    "representative_card_count": 6,
+    "prompt": "专业分镜图提示词；每张卡片左侧为无字幕缩略画面，右侧为简短执行备注",
+    "rules": [
+      "左侧缩略画面不含新增字幕、字幕条、贴纸、第三方 Logo、水印或 UI 覆盖层",
+      "保留主体类别、服装、姿态顺序、场景、光线、色彩和镜头节奏"
+    ]
+  },
   "adaptation": {
     "required_inputs": ["改编时需要的商品素材和信息"],
-    "must_keep": ["决定结构效果的关键机制"],
+    "must_keep": ["决定视觉复刻效果的关键机制"],
     "may_change": ["可以按商品调整的部分"],
-    "do_not_copy": ["原品牌、人物、逐字文案、音乐和未经验证的卖点"]
+    "do_not_copy": ["原品牌、人物身份、逐字文案、音乐和未经验证的卖点"]
   },
   "evidence_notes": ["工具警告、缺失信息或推断边界"],
   "confirmed_by_user": true,
